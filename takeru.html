@@ -2,135 +2,158 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>尊琉さんのこえ（完全版）</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>尊琉さんのこえ</title>
     <style>
-        body { margin: 0; font-family: sans-serif; background: #1a1a1a; color: white; }
-        
-        /* スクロールできるように設定 */
-        .grid { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; 
-            height: 100vh; overflow-y: auto; box-sizing: border-box; padding-bottom: 50px;
+        body { 
+            margin: 0; 
+            font-family: 'Hiragino Sans', 'Meiryo', sans-serif;
+            background: #000; 
+            color: #fff; 
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
         }
         
-        button {
-            border: none; border-radius: 12px; font-size: 1.2rem; font-weight: bold;
-            display: flex; align-items: center; justify-content: center; text-align: center;
-            padding: 15px 10px; min-height: 80px; /* タップしやすい高さ */
-            box-shadow: 0 4px #000; cursor: pointer; transition: 0.1s;
+        .container { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            padding: 15px; 
+            padding-bottom: 50px;
         }
-        button:active { transform: translateY(4px); box-shadow: none; }
 
-        /* カテゴリ別の色分け */
-        .urgent { background: #ff3b30; grid-column: span 2; font-size: 1.8rem; } /* すぐ来て */
-        .mind { background: #af52de; } /* 感情 */
-        .body-act { background: #ff9500; color: black; } /* 部位を伴う動作 */
-        .condition { background: #007aff; } /* 体調 */
-        .needs { background: #34c759; color: black; } /* お願い */
-        .bed { background: #5856d6; } /* ベッド */
-        
-        /* 選択画面（オーバーレイ）のスタイル */
-        .overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); grid-template-columns: 1fr 1fr; gap: 10px; padding: 20px;
-            box-sizing: border-box; z-index: 100; align-content: center;
+        /* ★ボタンの文字色をすべて「黒(#000)」に固定 */
+        button { 
+            border: none; 
+            border-radius: 15px; 
+            font-size: 1.1rem; 
+            font-weight: 900; /* 文字を最大限太く */
+            padding: 10px 5px; 
+            min-height: 80px; 
+            color: #000 !important; /* 文字色を黒に強制 */
+            cursor: pointer; 
+            box-shadow: 0 4px #444; /* 影を少し明るくしてボタンを際立たせる */
+            word-break: keep-all; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            line-height: 1.3;
         }
-        .overlay h2 { grid-column: span 2; text-align: center; margin-bottom: 20px; font-size: 1.5rem; }
-        .sub-btn { background: #007aff; min-height: 100px; font-size: 1.5rem; }
-        .close-btn { background: #8e8e93; grid-column: span 2; min-height: 80px; margin-top: 20px; }
+
+        button:active { 
+            transform: translateY(4px);
+            box-shadow: 0 0px #444; 
+        }
+
+        /* 背景色を少し明るくして、黒い文字が読みやすいように調整 */
+        .red { background: #ff453a; grid-column: span 2; font-size: 1.5rem; }
+        .purple { background: #d08df2; }
+        .blue { background: #5da9ff; }
+        .orange { background: #ff9f0a; }
+        .green { background: #32d74b; }
+        .indigo { background: #7d7aff; }
+
+        .overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            padding: 20px;
+            padding-top: calc(20px + env(safe-area-inset-top));
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
+            box-sizing: border-box; 
+            z-index: 1000; 
+            align-content: center;
+        }
+
+        .overlay h2 { color: #fff; margin: 0 0 10px 0; }
+
+        /* サブボタン（選択肢）も文字を黒にする */
+        .sub-btn { background: #eee; font-size: 1.4rem; font-weight: 900; }
+        .close { background: #acacb0; grid-column: span 2; min-height: 70px; margin-top: 20px; }
     </style>
 </head>
 <body>
+    <div class="container">
+        <button class="red" onclick="speak('すぐ来てください！')">🆘 すぐ来て！</button>
+        <button class="purple" onclick="speak('怒っています。理由を聞いてください')">💢 怒ってる</button>
+        <button class="purple" onclick="speak('とても嫌です')">🙅 とても嫌</button>
+        <button class="purple" onclick="speak('不安です')">😟 不安です</button>
+        <button class="purple" onclick="speak('怖いです')">😨 怖いです</button>
+        <button class="purple" onclick="speak('悲しいです')">😢 悲しい</button>
+        <button class="orange" onclick="showParts('が痛いです')">⚡ 痛い</button>
+        <button class="orange" onclick="showParts('がかゆいです')">✋ かゆい</button>
+        <button class="orange" onclick="showParts('を揉んでください')">💆 揉んで</button>
+        <button class="orange" onclick="showParts('に手を当てて')">🤲 手を当てて</button>
+        <button class="indigo" onclick="showBed('背中')">⤴️ 背中調整</button>
+        <button class="indigo" onclick="showBed('足')">⤴️ 足調整</button>
+        <button class="blue" onclick="speak('トイレに行きたいです')">🚽 トイレ</button>
+        <button class="blue" onclick="speak('しんどいです')">😫 しんどい</button>
+        <button class="blue" onclick="speak('寒いです。熱かも')">❄️ 寒い</button>
+        <button class="blue" onclick="speak('暑いです。薬効いたかも')">🔥 暑い</button>
+        <button class="blue" onclick="speak('気分が悪いです')">🤢 気分悪い</button>
+        <button class="blue" onclick="speak('吐きそうです')">🤮 吐きそう</button>
+        <button class="blue" onclick="speak('起き上がりたい')">🧍 起きたい</button>
+        <button class="green" onclick="speak('飲み物ください')">💧 飲み物</button>
+        <button class="green" onclick="speak('食べたいです')">🍞 食べたい</button>
+        <button class="green" onclick="speak('お腹すきました')">🤤 お腹すいた</button>
+        <button class="green" onclick="speak('ティッシュください')">🤧 ﾃｨｯｼｭ</button>
+        <button class="green" onclick="speak('薬のみます')">💊 薬のむ</button>
+        <button class="green" onclick="speak('着替えたいです')">👕 着替え</button>
+    </div>
 
-<div class="grid" id="main-grid">
-    <button class="urgent" onclick="speak('すぐ来てください！お願いします')">🆘 すぐ来て！</button>
+    <div id="part-overlay" class="overlay">
+        <h2 style="grid-column:span 2; text-align:center;">どこ？</h2>
+        <button class="sub-btn" onclick="donePart('頭')">頭</button>
+        <button class="sub-btn" onclick="donePart('首・肩')">首・肩</button>
+        <button class="sub-btn" onclick="donePart('腕・手')">腕・手</button>
+        <button class="sub-btn" onclick="donePart('お腹')">お腹</button>
+        <button class="sub-btn" onclick="donePart('背中')">背中</button>
+        <button class="sub-btn" onclick="donePart('足')">足</button>
+        <button class="close" onclick="closeAll()">× 戻る</button>
+    </div>
 
-    <button class="mind" onclick="speak('怒っています。理由を聞いてください')">💢 怒っている</button>
-    <button class="mind" onclick="speak('とても嫌です。やめてください')">🙅 とても嫌だ</button>
-    <button class="mind" onclick="speak('怖いです')">😨 怖い</button>
-    <button class="mind" onclick="speak('不安です')">😟 不安</button>
-    <button class="mind" onclick="speak('悲しいです')">😢 悲しい</button>
+    <div id="bed-overlay" class="overlay">
+        <h2 style="grid-column:span 2; text-align:center;">どうする？</h2>
+        <button class="sub-btn" style="background:#ff9f0a" onclick="doneBed('上げてください')">⬆️ 上げる</button>
+        <button class="sub-btn" style="background:#32d74b" onclick="doneBed('下げてください')">⬇️ 下げる</button>
+        <button class="close" onclick="closeAll()">× 戻る</button>
+    </div>
 
-    <button class="body-act" onclick="showParts('が痛いです')">⚡ 痛い</button>
-    <button class="body-act" onclick="showParts('がかゆいです')">✋ かゆい</button>
-    <button class="body-act" onclick="showParts('を揉んでください')">💆 揉んで</button>
-    <button class="body-act" onclick="showParts('に手を当ててください')">🤲 手を当てて</button>
+    <script>
+        let curAct = ""; let curBed = "";
+        const synth = window.speechSynthesis;
+        let isAudioInitialized = false;
 
-    <button class="bed" onclick="showBedControl('ベッドの背中を')">🛏️ 背中の高さ</button>
-    <button class="bed" onclick="showBedControl('ベッドの足を')">🛏️ 足の高さ</button>
+        function speak(t) { 
+            if (t === "") return;
+            synth.cancel(); 
+            const u = new SpeechSynthesisUtterance(t); 
+            u.lang = 'ja-JP'; 
+            u.rate = 1.0; 
+            synth.speak(u); 
+        }
 
-    <button class="condition" onclick="speak('トイレに行きたいです')">🚽 トイレ</button>
-    <button class="condition" onclick="speak('しんどいです')">疲れ・しんどい</button>
-    <button class="condition" onclick="speak('寒いです。熱が上がってきたかもしれません')">❄️ 寒い(熱かも)</button>
-    <button class="condition" onclick="speak('暑いです。解熱剤が効いてきたかもしれません')">🔥 暑い(薬効いた)</button>
-    <button class="condition" onclick="speak('気分が悪くなってきました')">🤢 気分が悪い</button>
-    <button class="condition" onclick="speak('吐きそうです')">🤮 吐きそう</button>
-    <button class="condition" onclick="speak('起き上がりたいです')">⬆️ 起き上がりたい</button>
-
-    <button class="needs" onclick="speak('飲み物ください')">💧 飲み物</button>
-    <button class="needs" onclick="speak('何か食べたいです')">🍞 食べたい</button>
-    <button class="needs" onclick="speak('お腹がすきました')">🤤 お腹すいた</button>
-    <button class="needs" onclick="speak('ティッシュをください')">🤧 ティッシュ</button>
-    <button class="needs" onclick="speak('薬をのみます')">💊 薬のむ</button>
-    <button class="needs" onclick="speak('着替えたいです')">👕 着替えたい</button>
-</div>
-
-<div class="overlay" id="part-overlay">
-    <h2>どこが？（部位を選択）</h2>
-    <button class="sub-btn" onclick="selectPart('頭')">頭</button>
-    <button class="sub-btn" onclick="selectPart('首・肩')">首・肩</button>
-    <button class="sub-btn" onclick="selectPart('腕・手')">腕・手</button>
-    <button class="sub-btn" onclick="selectPart('お腹')">お腹</button>
-    <button class="sub-btn" onclick="selectPart('背中')">背中</button>
-    <button class="sub-btn" onclick="selectPart('足')">足</button>
-    <button class="close-btn" onclick="hideOverlays()">× もどる</button>
-</div>
-
-<div class="overlay" id="bed-overlay">
-    <h2>どうする？（上下を選択）</h2>
-    <button class="sub-btn" style="background:#ff9500; color:black;" onclick="selectBedAction('上げてください')">⬆️ 上げて</button>
-    <button class="sub-btn" style="background:#34c759; color:black;" onclick="selectBedAction('下げてください')">⬇️ 下げて</button>
-    <button class="close-btn" onclick="hideOverlays()">× もどる</button>
-</div>
-
-<script>
-    let currentAction = "";
-    let currentBedTarget = "";
-
-    // 音声を読み上げる機能
-    function speak(text) {
-        window.speechSynthesis.cancel(); // 前の音声を止める
-        const uttr = new SpeechSynthesisUtterance(text);
-        uttr.lang = 'ja-JP';
-        window.speechSynthesis.speak(uttr);
-    }
-
-    // すべての隠し画面を閉じる
-    function hideOverlays() {
-        document.getElementById('part-overlay').style.display = 'none';
-        document.getElementById('bed-overlay').style.display = 'none';
-    }
-
-    // --- 部位選択の機能 ---
-    function showParts(action) {
-        currentAction = action; // 「が痛いです」などを記憶
-        document.getElementById('part-overlay').style.display = 'grid';
-    }
-    function selectPart(part) {
-        speak(part + currentAction); // 例：「頭」＋「が痛いです」
-        hideOverlays();
-    }
-
-    // --- ベッド操作の機能 ---
-    function showBedControl(target) {
-        currentBedTarget = target; // 「ベッドの背中を」などを記憶
-        document.getElementById('bed-overlay').style.display = 'grid';
-    }
-    function selectBedAction(action) {
-        speak(currentBedTarget + action); // 例：「ベッドの背中を」＋「上げてください」
-        hideOverlays();
-    }
-</script>
-
+        function showParts(a) { curAct = a; document.getElementById('part-overlay').style.display = 'grid'; }
+        function donePart(p) { speak(p + curAct); closeAll(); }
+        function showBed(b) { curBed = b; document.getElementById('bed-overlay').style.display = 'grid'; }
+        function doneBed(a) { speak('ベッドの' + curBed + 'を' + a); closeAll(); }
+        function closeAll() { document.querySelectorAll('.overlay').forEach(e => e.style.display = 'none'); }
+        
+        document.body.addEventListener('touchstart', () => { 
+            if (!isAudioInitialized) {
+                const u = new SpeechSynthesisUtterance('');
+                synth.speak(u);
+                isAudioInitialized = true;
+            }
+        }, { once: true, passive: true });
+    </script>
 </body>
 </html>
