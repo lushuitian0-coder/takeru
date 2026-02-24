@@ -6,52 +6,43 @@
     <title>尊琉さんのこえ</title>
     <style>
         body { 
-            margin: 0; 
-            font-family: 'Hiragino Sans', 'Meiryo', sans-serif;
-            background: #000; 
-            color: #fff; 
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
-        }
-        
-        .container { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 10px; 
-            padding: 15px; 
-            padding-bottom: 50px;
+            margin: 0; font-family: 'Hiragino Sans', 'Meiryo', sans-serif; background: #000; color: #fff; 
+            touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+            padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);
         }
 
-        /* ★ボタンの文字色をすべて「黒(#000)」に固定 */
+        /* 通知スイッチのエリア */
+        .top-bar {
+            display: flex; justify-content: flex-end; align-items: center;
+            padding: 10px 15px; background: #1a1a1a; position: sticky; top: 0; z-index: 2000;
+        }
+        .toggle-label { margin-right: 10px; font-weight: bold; font-size: 1rem; }
+        .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #444; transition: .4s; border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #32d74b; }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        /* ボタンのデザイン */
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; padding-bottom: 50px; }
         button { 
-            border: none; 
-            border-radius: 15px; 
-            font-size: 1.1rem; 
-            font-weight: 900; /* 文字を最大限太く */
-            padding: 10px 5px; 
-            min-height: 80px; 
-            color: #000 !important; /* 文字色を黒に強制 */
-            cursor: pointer; 
-            box-shadow: 0 4px #444; /* 影を少し明るくしてボタンを際立たせる */
-            word-break: keep-all; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            line-height: 1.3;
+            border: none; border-radius: 15px; font-size: 1.1rem; font-weight: 900; 
+            padding: 10px 5px; min-height: 80px; color: #000 !important; cursor: pointer; 
+            box-shadow: 0 4px #444; word-break: keep-all; display: flex; align-items: center; 
+            justify-content: center; flex-direction: column; line-height: 1.3;
         }
+        button:active { transform: translateY(4px); box-shadow: 0 0px #444; }
 
-        button:active { 
-            transform: translateY(4px);
-            box-shadow: 0 0px #444; 
-        }
-
-        /* 背景色を少し明るくして、黒い文字が読みやすいように調整 */
         .red { background: #ff453a; grid-column: span 2; font-size: 1.5rem; }
+        .pink { background: #ff9ce6; } /* 感謝・気持ちのボタン用 */
         .purple { background: #d08df2; }
         .blue { background: #5da9ff; }
         .orange { background: #ff9f0a; }
@@ -59,54 +50,60 @@
         .indigo { background: #7d7aff; }
 
         .overlay { 
-            display: none; 
-            position: fixed; 
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); 
-            grid-template-columns: 1fr 1fr; 
-            gap: 12px; 
-            padding: 20px;
-            padding-top: calc(20px + env(safe-area-inset-top));
-            padding-bottom: calc(20px + env(safe-area-inset-bottom));
-            box-sizing: border-box; 
-            z-index: 1000; 
-            align-content: center;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); grid-template-columns: 1fr 1fr; gap: 12px; padding: 20px;
+            padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: calc(20px + env(safe-area-inset-bottom));
+            box-sizing: border-box; z-index: 3000; align-content: center;
         }
-
         .overlay h2 { color: #fff; margin: 0 0 10px 0; }
-
-        /* サブボタン（選択肢）も文字を黒にする */
         .sub-btn { background: #eee; font-size: 1.4rem; font-weight: 900; }
         .close { background: #acacb0; grid-column: span 2; min-height: 70px; margin-top: 20px; }
     </style>
 </head>
 <body>
+    <div class="top-bar">
+        <span class="toggle-label">家族への通知</span>
+        <label class="switch">
+            <input type="checkbox" id="notify-toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+
     <div class="container">
-        <button class="red" onclick="speak('すぐ来てください！')">🆘 すぐ来て！</button>
-        <button class="purple" onclick="speak('怒っています。理由を聞いてください')">💢 怒ってる</button>
-        <button class="purple" onclick="speak('とても嫌です')">🙅 とても嫌</button>
-        <button class="purple" onclick="speak('不安です')">😟 不安です</button>
-        <button class="purple" onclick="speak('怖いです')">😨 怖いです</button>
-        <button class="purple" onclick="speak('悲しいです')">😢 悲しい</button>
+        <button class="red" onclick="speakWithNotify('すぐ来てください！')">🆘 すぐ来て！</button>
+        
+        <button class="pink" onclick="speakWithNotify('ありがとう')">✨ ありがとう</button>
+        <button class="pink" onclick="speakWithNotify('いつもありがとう')">💖 いつも感謝</button>
+        <button class="pink" onclick="speakWithNotify('うれしいです')">😊 うれしい</button>
+        <button class="pink" onclick="speakWithNotify('大好きやで')">🥰 大好きやで</button>
+
+        <button class="purple" onclick="speakWithNotify('怒っています。理由を聞いてください')">💢 怒ってる</button>
+        <button class="purple" onclick="speakWithNotify('とても嫌です')">🙅 とても嫌</button>
+        <button class="purple" onclick="speakWithNotify('不安です')">😟 不安です</button>
+        <button class="purple" onclick="speakWithNotify('怖いです')">😨 怖いです</button>
+        <button class="purple" onclick="speakWithNotify('悲しいです')">😢 悲しい</button>
+
         <button class="orange" onclick="showParts('が痛いです')">⚡ 痛い</button>
         <button class="orange" onclick="showParts('がかゆいです')">✋ かゆい</button>
         <button class="orange" onclick="showParts('を揉んでください')">💆 揉んで</button>
         <button class="orange" onclick="showParts('に手を当てて')">🤲 手を当てて</button>
         <button class="indigo" onclick="showBed('背中')">⤴️ 背中調整</button>
         <button class="indigo" onclick="showBed('足')">⤴️ 足調整</button>
-        <button class="blue" onclick="speak('トイレに行きたいです')">🚽 トイレ</button>
-        <button class="blue" onclick="speak('しんどいです')">😫 しんどい</button>
-        <button class="blue" onclick="speak('寒いです。熱かも')">❄️ 寒い</button>
-        <button class="blue" onclick="speak('暑いです。薬効いたかも')">🔥 暑い</button>
-        <button class="blue" onclick="speak('気分が悪いです')">🤢 気分悪い</button>
-        <button class="blue" onclick="speak('吐きそうです')">🤮 吐きそう</button>
-        <button class="blue" onclick="speak('起き上がりたい')">🧍 起きたい</button>
-        <button class="green" onclick="speak('飲み物ください')">💧 飲み物</button>
-        <button class="green" onclick="speak('食べたいです')">🍞 食べたい</button>
-        <button class="green" onclick="speak('お腹すきました')">🤤 お腹すいた</button>
-        <button class="green" onclick="speak('ティッシュください')">🤧 ﾃｨｯｼｭ</button>
-        <button class="green" onclick="speak('薬のみます')">💊 薬のむ</button>
-        <button class="green" onclick="speak('着替えたいです')">👕 着替え</button>
+        
+        <button class="blue" onclick="showToilet()">🚽 トイレ</button>
+        
+        <button class="blue" onclick="speakWithNotify('しんどいです')">😫 しんどい</button>
+        <button class="blue" onclick="speakWithNotify('寒いです。熱かも')">❄️ 寒い</button>
+        <button class="blue" onclick="speakWithNotify('暑いです。薬効いたかも')">🔥 暑い</button>
+        <button class="blue" onclick="speakWithNotify('気分が悪いです')">🤢 気分悪い</button>
+        <button class="blue" onclick="speakWithNotify('吐きそうです')">🤮 吐きそう</button>
+        <button class="blue" onclick="speakWithNotify('起き上がりたい')">🧍 起きたい</button>
+        <button class="green" onclick="speakWithNotify('飲み物ください')">💧 飲み物</button>
+        <button class="green" onclick="speakWithNotify('食べたいです')">🍞 食べたい</button>
+        <button class="green" onclick="speakWithNotify('お腹すきました')">🤤 お腹すいた</button>
+        <button class="green" onclick="speakWithNotify('ティッシュください')">🤧 ﾃｨｯｼｭ</button>
+        <button class="green" onclick="speakWithNotify('薬のみます')">💊 薬のむ</button>
+        <button class="green" onclick="speakWithNotify('着替えたいです')">👕 着替え</button>
     </div>
 
     <div id="part-overlay" class="overlay">
@@ -117,6 +114,7 @@
         <button class="sub-btn" onclick="donePart('お腹')">お腹</button>
         <button class="sub-btn" onclick="donePart('背中')">背中</button>
         <button class="sub-btn" onclick="donePart('足')">足</button>
+        <button class="sub-btn" onclick="donePart('のど')">のど</button>
         <button class="close" onclick="closeAll()">× 戻る</button>
     </div>
 
@@ -127,24 +125,56 @@
         <button class="close" onclick="closeAll()">× 戻る</button>
     </div>
 
+    <div id="toilet-overlay" class="overlay">
+        <h2 style="grid-column:span 2; text-align:center;">どっち？</h2>
+        <button class="sub-btn" onclick="doneToilet('大')">💩 大</button>
+        <button class="sub-btn" onclick="doneToilet('小')">💦 小</button>
+        <button class="close" onclick="closeAll()">× 戻る</button>
+    </div>
+
     <script>
         let curAct = ""; let curBed = "";
         const synth = window.speechSynthesis;
         let isAudioInitialized = false;
 
-        function speak(t) { 
-            if (t === "") return;
-            synth.cancel(); 
-            const u = new SpeechSynthesisUtterance(t); 
-            u.lang = 'ja-JP'; 
-            u.rate = 1.0; 
-            synth.speak(u); 
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1475746115587538964/uULkrnw9J99BnfWSh3hn4jbkktELAhplQq2No_wyczUORONkuGFTORhbSxyBtOuF-H5p"; 
+
+        function speakWithNotify(text) {
+            if(!text) return;
+            
+            // 1. 音声を再生
+            synth.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'ja-JP';
+            u.rate = 1.0;
+            synth.speak(u);
+
+            // 2. 通知を送信（スイッチがONの場合のみ）
+            const isToggleOn = document.getElementById('notify-toggle').checked;
+            if (isToggleOn) {
+                fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: "📢 **尊琉さんのこえ**\n「" + text + "」"
+                    })
+                }).catch(e => console.error("通知エラー:", e));
+            }
         }
 
+        // 体の部位の処理
         function showParts(a) { curAct = a; document.getElementById('part-overlay').style.display = 'grid'; }
-        function donePart(p) { speak(p + curAct); closeAll(); }
+        function donePart(p) { speakWithNotify(p + curAct); closeAll(); }
+        
+        // ベッドの処理
         function showBed(b) { curBed = b; document.getElementById('bed-overlay').style.display = 'grid'; }
-        function doneBed(a) { speak('ベッドの' + curBed + 'を' + a); closeAll(); }
+        function doneBed(a) { speakWithNotify('ベッドの' + curBed + 'を' + a); closeAll(); }
+
+        // トイレの処理（新規追加）
+        function showToilet() { document.getElementById('toilet-overlay').style.display = 'grid'; }
+        function doneToilet(t) { speakWithNotify('トイレに行きたいです。' + t + 'です。'); closeAll(); }
+        
+        // 全てのオーバーレイを閉じる
         function closeAll() { document.querySelectorAll('.overlay').forEach(e => e.style.display = 'none'); }
         
         document.body.addEventListener('touchstart', () => { 
