@@ -42,7 +42,7 @@
         button:active { transform: translateY(4px); box-shadow: 0 0px #444; }
 
         .red { background: #ff453a; grid-column: span 2; font-size: 1.5rem; }
-        .pink { background: #ff9ce6; } /* 感謝・気持ちのボタン用 */
+        .pink { background: #ff9ce6; }
         .purple { background: #d08df2; }
         .blue { background: #5da9ff; }
         .orange { background: #ff9f0a; }
@@ -91,14 +91,15 @@
         <button class="indigo" onclick="showBed('足')">⤴️ 足調整</button>
         
         <button class="blue" onclick="showToilet()">🚽 トイレ</button>
-        
         <button class="blue" onclick="speakWithNotify('しんどいです')">😫 しんどい</button>
         <button class="blue" onclick="speakWithNotify('寒いです。熱かも')">❄️ 寒い</button>
         <button class="blue" onclick="speakWithNotify('暑いです。薬効いたかも')">🔥 暑い</button>
         <button class="blue" onclick="speakWithNotify('気分が悪いです')">🤢 気分悪い</button>
         <button class="blue" onclick="speakWithNotify('吐きそうです')">🤮 吐きそう</button>
         <button class="blue" onclick="speakWithNotify('起き上がりたい')">🧍 起きたい</button>
-        <button class="green" onclick="speakWithNotify('飲み物ください')">💧 飲み物</button>
+        
+        <button class="green" onclick="showDrink()">💧 飲み物</button>
+        
         <button class="green" onclick="speakWithNotify('食べたいです')">🍞 食べたい</button>
         <button class="green" onclick="speakWithNotify('お腹すきました')">🤤 お腹すいた</button>
         <button class="green" onclick="speakWithNotify('ティッシュください')">🤧 ﾃｨｯｼｭ</button>
@@ -115,6 +116,7 @@
         <button class="sub-btn" onclick="donePart('背中')">背中</button>
         <button class="sub-btn" onclick="donePart('足')">足</button>
         <button class="sub-btn" onclick="donePart('のど')">のど</button>
+        <button class="sub-btn" onclick="donePart('おしり')">おしり</button>
         <button class="close" onclick="closeAll()">× 戻る</button>
     </div>
 
@@ -132,6 +134,14 @@
         <button class="close" onclick="closeAll()">× 戻る</button>
     </div>
 
+    <div id="drink-overlay" class="overlay">
+        <h2 style="grid-column:span 2; text-align:center;">なにを飲む？</h2>
+        <button class="sub-btn" onclick="doneDrink('お茶')">🍵 お茶</button>
+        <button class="sub-btn" onclick="doneDrink('アクエリアス')">💧 ｱｸｴﾘｱｽ</button>
+        <button class="sub-btn" onclick="doneDrink('カルピス')">🥛 カルピス</button>
+        <button class="close" onclick="closeAll()">× 戻る</button>
+    </div>
+
     <script>
         let curAct = ""; let curBed = "";
         const synth = window.speechSynthesis;
@@ -142,14 +152,12 @@
         function speakWithNotify(text) {
             if(!text) return;
             
-            // 1. 音声を再生
             synth.cancel();
             const u = new SpeechSynthesisUtterance(text);
             u.lang = 'ja-JP';
             u.rate = 1.0;
             synth.speak(u);
 
-            // 2. 通知を送信（スイッチがONの場合のみ）
             const isToggleOn = document.getElementById('notify-toggle').checked;
             if (isToggleOn) {
                 fetch(DISCORD_WEBHOOK_URL, {
@@ -162,19 +170,19 @@
             }
         }
 
-        // 体の部位の処理
         function showParts(a) { curAct = a; document.getElementById('part-overlay').style.display = 'grid'; }
         function donePart(p) { speakWithNotify(p + curAct); closeAll(); }
         
-        // ベッドの処理
         function showBed(b) { curBed = b; document.getElementById('bed-overlay').style.display = 'grid'; }
         function doneBed(a) { speakWithNotify('ベッドの' + curBed + 'を' + a); closeAll(); }
 
-        // トイレの処理（新規追加）
         function showToilet() { document.getElementById('toilet-overlay').style.display = 'grid'; }
         function doneToilet(t) { speakWithNotify('トイレに行きたいです。' + t + 'です。'); closeAll(); }
+
+        // 飲み物の処理（新規追加）
+        function showDrink() { document.getElementById('drink-overlay').style.display = 'grid'; }
+        function doneDrink(d) { speakWithNotify(d + 'が飲みたいです'); closeAll(); }
         
-        // 全てのオーバーレイを閉じる
         function closeAll() { document.querySelectorAll('.overlay').forEach(e => e.style.display = 'none'); }
         
         document.body.addEventListener('touchstart', () => { 
