@@ -99,12 +99,12 @@
         <button class="blue" onclick="speakWithNotify('起き上がりたい')">🧍 起きたい</button>
         
         <button class="green" onclick="showDrink()">💧 飲み物</button>
-        
         <button class="green" onclick="speakWithNotify('食べたいです')">🍞 食べたい</button>
         <button class="green" onclick="speakWithNotify('お腹すきました')">🤤 お腹すいた</button>
         <button class="green" onclick="speakWithNotify('ティッシュください')">🤧 ﾃｨｯｼｭ</button>
         <button class="green" onclick="speakWithNotify('薬のみます')">💊 薬のむ</button>
         <button class="green" onclick="speakWithNotify('着替えたいです')">👕 着替え</button>
+        <button class="green" onclick="speakWithNotify('歯磨きをしたいです')">🦷 歯磨き</button>
     </div>
 
     <div id="part-overlay" class="overlay">
@@ -139,6 +139,7 @@
         <button class="sub-btn" onclick="doneDrink('お茶')">🍵 お茶</button>
         <button class="sub-btn" onclick="doneDrink('アクエリアス')">💧 ｱｸｴﾘｱｽ</button>
         <button class="sub-btn" onclick="doneDrink('カルピス')">🥛 カルピス</button>
+        <button class="sub-btn" onclick="doneDrink('デカビタ')">⚡ ﾃﾞｶﾋﾞﾀ</button>
         <button class="close" onclick="closeAll()">× 戻る</button>
     </div>
 
@@ -179,7 +180,6 @@
         function showToilet() { document.getElementById('toilet-overlay').style.display = 'grid'; }
         function doneToilet(t) { speakWithNotify('トイレに行きたいです。' + t + 'です。'); closeAll(); }
 
-        // 飲み物の処理（新規追加）
         function showDrink() { document.getElementById('drink-overlay').style.display = 'grid'; }
         function doneDrink(d) { speakWithNotify(d + 'が飲みたいです'); closeAll(); }
         
